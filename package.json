@@ -1,7 +1,7 @@
 {
   "name": "smartlink",
   "productName": "SmartLink",
-  "version": "5.23.2",
+  "version": "5.23.3",
   "description": "SmartLink – Art-Net styring af Laserworld DS-3000RGB MK5",
   "main": "src/main.js",
   "author": "Willads",
@@ -58,6 +58,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/TRANBERGMUSIC/lightlink.git"
+    "url": "https://github.com/TRANBERGGROUP/smartlink.git"
   }
 }

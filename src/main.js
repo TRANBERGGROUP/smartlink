@@ -481,7 +481,8 @@ function createWindow() {
 
 // ---------- opdateringer fra GitHub Releases ----------
 // Appen tjekker den nyeste release, henter SmartLink-Mac.zip, pakker den ud og bytter sig selv ud (uden Apple-signatur).
-const UPDATE_REPO = 'TRANBERGMUSIC/smartlink'; // repo-navnet er uændret
+// GitHub-brugeren hedder nu TRANBERGGROUP (tidligere TRANBERGMUSIC). Det gamle navn prøves også, så opdatering virker både før og efter omdøbningen.
+const UPDATE_REPOS = ['TRANBERGGROUP/smartlink', 'TRANBERGMUSIC/smartlink'], UPDATE_REPO = UPDATE_REPOS[0];
 const https = require('https');
 function httpsGet(url, { onProgress, toFile } = {}, hops = 0) {
   return new Promise((resolve, reject) => {
@@ -504,7 +505,9 @@ function newer(a, b) { const x = semver(a), y = semver(b); for (let i = 0; i < 3
 ipcMain.handle('app-version', () => app.getVersion());
 ipcMain.handle('update-check', async () => {
   try {
-    const r = await httpsGet(`https://api.github.com/repos/${UPDATE_REPO}/releases/latest`);
+    let r = null, lastErr = null;
+    for (const repo of UPDATE_REPOS) { try { r = await httpsGet(`https://api.github.com/repos/${repo}/releases/latest`); break; } catch (e) { lastErr = e; } }
+    if (!r) throw lastErr || new Error('ingen svar fra GitHub');
     const j = JSON.parse(r.body); const latest = String(j.tag_name || '').replace(/^v/, '');
     const asset = (j.assets || []).find((a) => /(SmartLink|LightLink)-Mac\.zip$/i.test(a.name));
     return { ok: true, current: app.getVersion(), latest, newer: newer(latest, app.getVersion()) && !!asset, url: asset ? asset.browser_download_url : null, notes: j.body || '', page: j.html_url || `https://github.com/${UPDATE_REPO}/releases` };
